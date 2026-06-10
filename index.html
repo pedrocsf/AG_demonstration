@@ -41,13 +41,70 @@
     <div id="legend-panel">
         <h3>Legenda - Conceitos Genéticos</h3>
         <ul>
-            <li><strong>Indivíduo:</strong> Uma única solução possível para o problema (um ponto na tela).</li>
-            <li><strong>População:</strong> Conjunto de todos os indivíduos avaliados na geração atual.</li>
-            <li><strong>Cromossomo / Genótipo:</strong> A estrutura de dados do indivíduo (aqui, as coordenadas X e Y).
-            </li>
-            <li><strong>Gene:</strong> Uma parte do cromossomo (ex: apenas a coordenada X).</li>
-            <li><strong>Fenótipo:</strong> A manifestação do genótipo no ambiente (a posição visual no espaço 2D).</li>
-            <li><strong>Melhor Solução:</strong> O indivíduo com o melhor "Fitness" (menor distância para o alvo).</li>
+                    <li>
+            <strong>Indivíduo:</strong>
+            Uma única solução candidata para o problema. Na simulação, cada indivíduo é representado por um ponto colorido na tela.
+        </li>
+
+        <li>
+            <strong>População:</strong>
+            O conjunto de todos os indivíduos existentes em uma geração. Na simulação, corresponde a todos os pontos visíveis na tela.
+        </li>
+
+        <li>
+            <strong>Cromossomo:</strong>
+            A estrutura completa que armazena a informação genética de um indivíduo. Neste exemplo, ele contém todos os valores necessários para definir sua posição e características.
+        </li>
+
+        <li>
+            <strong>Gene:</strong>
+            Uma unidade de informação dentro do cromossomo. Por exemplo, a coordenada X ou a coordenada Y podem ser consideradas genes distintos.
+        </li>
+
+        <li>
+            <strong>Genótipo:</strong>
+            O conjunto de genes que define internamente um indivíduo. É a representação da solução armazenada pelo algoritmo, como os valores numéricos das coordenadas.
+        </li>
+
+        <li>
+            <strong>Fenótipo:</strong>
+            A manifestação visível do genótipo no ambiente. Na simulação, corresponde à posição que o indivíduo ocupa na tela e ao seu comportamento observável.
+        </li>
+
+        <li>
+            <strong>Fitness (Aptidão):</strong>
+            A medida de qualidade de uma solução. Neste caso, quanto menor a distância até o alvo, maior será o fitness do indivíduo.
+        </li>
+
+        <li>
+            <strong>Melhor Solução:</strong>
+            O indivíduo com o maior fitness da geração atual, ou seja, aquele que está mais próximo do objetivo definido.
+        </li>
+
+        <li>
+            <strong>Seleção:</strong>
+            Processo de escolha dos indivíduos mais aptos para gerar descendentes e transmitir suas características para a próxima geração.
+        </li>
+
+        <li>
+            <strong>Crossover (Cruzamento):</strong>
+            Combinação dos genes de dois indivíduos selecionados para produzir novos indivíduos com características herdadas de ambos.
+        </li>
+
+        <li>
+            <strong>Mutação:</strong>
+            Pequena alteração aleatória em um ou mais genes. Ela introduz diversidade genética e ajuda a explorar novas soluções.
+        </li>
+
+        <li>
+            <strong>Geração:</strong>
+            Um ciclo completo do algoritmo, composto pela avaliação dos indivíduos e pela criação de uma nova população.
+        </li>
+
+        <li>
+            <strong>Convergência:</strong>
+            Estado em que a população deixa de apresentar melhorias significativas, indicando que o algoritmo encontrou uma solução próxima do ótimo.
+        </li>
         </ul>
     </div>
 
