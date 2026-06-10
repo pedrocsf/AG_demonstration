@@ -34,6 +34,9 @@ const infoBtn = document.getElementById("infoBtn");
 const infoDialog = document.getElementById("infoDialog");
 const closeDialogBtn = document.getElementById("closeDialogBtn");
 
+const mobileWarningDialog = document.getElementById("mobileWarningDialog");
+const closeMobileWarningBtn = document.getElementById("closeMobileWarningBtn");
+
 class Individual {
   constructor(x, y) {
     this.x = x !== undefined ? x : Math.random() * width;
@@ -214,6 +217,16 @@ infoBtn.addEventListener("click", () => {
 closeDialogBtn.addEventListener("click", () => {
   infoDialog.close();
 });
+
+closeMobileWarningBtn.addEventListener("click", () => {
+  mobileWarningDialog.close();
+});
+
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                 (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && window.innerWidth < 1024);
+if (isMobile) {
+  mobileWarningDialog.showModal();
+}
 
 function render(timestamp) {
   if (!lastTime) lastTime = timestamp;

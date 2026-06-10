@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AG Demonstration</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -141,8 +142,19 @@
             <img src="ufg_logo.png" alt="Logo UFG" class="dialog-logo">
         </div>
         <h3>AG Demonstration</h3>
-        <p>Este é um trabalho desenvolvido por alunos de graduação da Universidade Federal de Goiás (UFG) para a disciplina de Inteligência Computacional ministrada pelo Prof. Dr. Cedric Luiz de Carvalho no semestre 2026.1. Tem o objetivo de demonstrar a abstração de um Algoritmo Genético em uma interface gráfica interativa.</p>
+        <p>Este é um trabalho desenvolvido por alunos de graduação da Universidade Federal de Goiás (UFG) para a
+            disciplina de Inteligência Computacional ministrada pelo Prof. Dr. Cedric Luiz de Carvalho no semestre
+            2026.1. Tem o objetivo de demonstrar a abstração de um Algoritmo Genético em uma interface gráfica
+            interativa.</p>
         <button id="closeDialogBtn" class="close-btn">Fechar</button>
+    </dialog>
+
+    <dialog id="mobileWarningDialog" class="custom-dialog">
+        <h3>Aviso de Visualização</h3>
+        <p>Parece que você está acessando através de um celular ou tablet. Para uma melhor experiência com a simulação,
+            recomendamos que clique nos 3 pontos do menu do seu navegador e ative a opção <strong>"Versão para
+                computador"</strong> (ou "Desktop site").</p>
+        <button id="closeMobileWarningBtn" class="close-btn">Entendi</button>
     </dialog>
 
     <canvas id="canvas"></canvas>
