@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualização Gource - Algoritmo Genético</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div id="ui-panel">
         <h2>Algoritmo Genético</h2>
@@ -21,6 +23,10 @@
             <label for="patience">Patience (Convergência):</label>
             <input type="number" id="patience" value="15" min="1" max="100">
         </div>
+        <div class="control-group">
+            <label for="duration">Tempo de Exibição (s):</label>
+            <input type="number" id="duration" value="10" min="1" max="60">
+        </div>
         <button id="startBtn">Iniciar Evolução</button>
     </div>
 
@@ -32,7 +38,21 @@
         <input type="range" id="timeline" min="0" max="0" value="0" step="0.01">
     </div>
 
+    <div id="legend-panel">
+        <h3>Legenda - Conceitos Genéticos</h3>
+        <ul>
+            <li><strong>Indivíduo:</strong> Uma única solução possível para o problema (um ponto na tela).</li>
+            <li><strong>População:</strong> Conjunto de todos os indivíduos avaliados na geração atual.</li>
+            <li><strong>Cromossomo / Genótipo:</strong> A estrutura de dados do indivíduo (aqui, as coordenadas X e Y).
+            </li>
+            <li><strong>Gene:</strong> Uma parte do cromossomo (ex: apenas a coordenada X).</li>
+            <li><strong>Fenótipo:</strong> A manifestação do genótipo no ambiente (a posição visual no espaço 2D).</li>
+            <li><strong>Melhor Solução:</strong> O indivíduo com o melhor "Fitness" (menor distância para o alvo).</li>
+        </ul>
+    </div>
+
     <canvas id="canvas"></canvas>
     <script src="app.js"></script>
 </body>
+
 </html>

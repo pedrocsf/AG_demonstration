@@ -79,6 +79,41 @@ button:hover {
     background: #00aacc;
 }
 
+#legend-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(15, 20, 30, 0.85);
+    border: 1px solid #2a3b4c;
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 10;
+    width: 320px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+#legend-panel h3 {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #00e5ff;
+}
+
+#legend-panel ul {
+    list-style-type: none;
+}
+
+#legend-panel li {
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    color: #d0e0f0;
+    line-height: 1.4;
+}
+
+#legend-panel li strong {
+    color: #ffffff;
+}
+
 #timeline-container {
     position: absolute;
     bottom: 30px;

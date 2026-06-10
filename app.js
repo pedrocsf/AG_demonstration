@@ -4,6 +4,9 @@ const ctx = canvas.getContext("2d");
 let width, height, target;
 let historyData = [];
 let isAnimating = false;
+let autoPlay = false;
+let lastTime = 0;
+let playbackSpeed = 0;
 
 function resize() {
   width = window.innerWidth;
@@ -117,6 +120,7 @@ btnStart.addEventListener("click", () => {
   const popSize = parseInt(document.getElementById("popSize").value);
   const maxGen = parseInt(document.getElementById("maxGen").value);
   const patience = parseInt(document.getElementById("patience").value);
+  const durationSec = parseFloat(document.getElementById("duration").value);
 
   historyData = runGA(popSize, maxGen, patience);
 
@@ -124,13 +128,35 @@ btnStart.addEventListener("click", () => {
   timeline.value = 0;
   timelineContainer.classList.remove("hidden");
 
+  autoPlay = true;
+  playbackSpeed = (historyData.length - 1) / (durationSec * 1000); // Gerações por milissegundo
+  lastTime = 0; // Reseta o timer para o próximo frame
+
   if (!isAnimating) {
     isAnimating = true;
     requestAnimationFrame(render);
   }
 });
 
-function render() {
+// Interrompe o autoplay caso o usuário arraste a timeline
+timeline.addEventListener("input", () => {
+  autoPlay = false;
+});
+
+function render(timestamp) {
+  if (!lastTime) lastTime = timestamp;
+  const deltaTime = timestamp - lastTime;
+  lastTime = timestamp;
+
+  if (autoPlay) {
+    let nextVal = parseFloat(timeline.value) + playbackSpeed * deltaTime;
+    if (nextVal >= timeline.max) {
+      nextVal = timeline.max;
+      autoPlay = false;
+    }
+    timeline.value = nextVal;
+  }
+
   ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
   ctx.fillRect(0, 0, width, height);
 
