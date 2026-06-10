@@ -129,8 +129,8 @@ btnStart.addEventListener("click", () => {
   timelineContainer.classList.remove("hidden");
 
   autoPlay = true;
-  playbackSpeed = (historyData.length - 1) / (durationSec * 1000); // Gerações por milissegundo
-  lastTime = 0; // Reseta o timer para o próximo frame
+  playbackSpeed = (historyData.length - 1) / (durationSec * 1000);
+  lastTime = 0; 
 
   if (!isAnimating) {
     isAnimating = true;
@@ -138,7 +138,7 @@ btnStart.addEventListener("click", () => {
   }
 });
 
-// Interrompe o autoplay caso o usuário arraste a timeline
+
 timeline.addEventListener("input", () => {
   autoPlay = false;
 });

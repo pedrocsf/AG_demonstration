@@ -89,6 +89,8 @@ button:hover {
     border-radius: 8px;
     z-index: 10;
     width: 320px;
+    max-height: 80vh;
+    overflow-y: auto;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(5px);
 }
@@ -112,6 +114,25 @@ button:hover {
 
 #legend-panel li strong {
     color: #ffffff;
+}
+
+/* Estilização da barra de rolagem para combinar com o tema escuro */
+#legend-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+#legend-panel::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+#legend-panel::-webkit-scrollbar-thumb {
+    background: #0088aa;
+    border-radius: 4px;
+}
+
+#legend-panel::-webkit-scrollbar-thumb:hover {
+    background: #00aacc;
 }
 
 #timeline-container {
