@@ -94,20 +94,48 @@ function runGA(popSize, maxGen, patience, crossoverRate, mutationRate) {
       let p1 = tournament(population);
       let p2 = tournament(population);
 
+      if (p2.fitness < p1.fitness) {
+        let temp = p1;
+        p1 = p2;
+        p2 = temp;
+      }
+
       let childX, childY;
 
       if (Math.random() < crossoverRate) {
-        childX = (p1.x + p2.x) / 2;
-        childY = (p1.y + p2.y) / 2;
+        let minX = Math.min(p1.x, p2.x),
+          maxX = Math.max(p1.x, p2.x);
+        let minY = Math.min(p1.y, p2.y),
+          maxY = Math.max(p1.y, p2.y);
+
+        let rangeX = maxX - minX;
+        let rangeY = maxY - minY;
+
+        childX = minX - rangeX * 0.25 + Math.random() * (rangeX * 1.5);
+        childY = minY - rangeY * 0.25 + Math.random() * (rangeY * 1.5);
+
+        let maxStep = Math.max(width, height) / (maxGen * 0.3);
+        let dx = childX - p1.x;
+        let dy = childY - p1.y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist > maxStep) {
+          childX = p1.x + (dx / dist) * maxStep;
+          childY = p1.y + (dy / dist) * maxStep;
+        }
       } else {
         childX = p1.x;
         childY = p1.y;
       }
 
       if (Math.random() < mutationRate) {
-        childX += (Math.random() - 0.5) * 100;
-        childY += (Math.random() - 0.5) * 100;
+        let mutationPower = Math.max(width, height) / (maxGen * 0.3);
+        childX += (Math.random() - 0.5) * mutationPower * 2;
+        childY += (Math.random() - 0.5) * mutationPower * 2;
       }
+
+      childX = Math.max(0, Math.min(width, childX));
+      childY = Math.max(0, Math.min(height, childY));
 
       newPopulation.push(new Individual(childX, childY));
     }
@@ -131,6 +159,11 @@ btnStart.addEventListener("click", () => {
     parseFloat(document.getElementById("crossoverRate").value) / 100;
   const mutationRate =
     parseFloat(document.getElementById("mutationRate").value) / 100;
+
+  target = {
+    x: 50 + Math.random() * (width - 100),
+    y: 50 + Math.random() * (height - 100),
+  };
 
   historyData = runGA(popSize, maxGen, patience, crossoverRate, mutationRate);
 
