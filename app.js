@@ -7,6 +7,7 @@ let isAnimating = false;
 let autoPlay = false;
 let lastTime = 0;
 let playbackSpeed = 0;
+let exactTimelineValue = 0;
 
 function resize() {
   width = window.innerWidth;
@@ -166,26 +167,44 @@ function tournament(pop) {
 }
 
 btnStart.addEventListener("click", () => {
-  const popSize = parseInt(document.getElementById("popSize").value);
-  const maxGen = parseInt(document.getElementById("maxGen").value);
-  const patience = parseInt(document.getElementById("patience").value);
-  const durationSec = parseFloat(document.getElementById("duration").value);
+  const popSize = Math.max(
+    10,
+    parseInt(document.getElementById("popSize").value) || 150,
+  );
+  const maxGen = Math.max(
+    1,
+    parseInt(document.getElementById("maxGen").value) || 20,
+  );
+  const patience = Math.max(
+    1,
+    parseInt(document.getElementById("patience").value) || 15,
+  );
+  const durationSec = Math.max(
+    1,
+    parseFloat(document.getElementById("duration").value) || 30,
+  );
   const crossoverRate =
-    parseFloat(document.getElementById("crossoverRate").value) / 100;
+    Math.max(
+      0,
+      parseFloat(document.getElementById("crossoverRate").value) || 90,
+    ) / 100;
   const mutationRate =
-    parseFloat(document.getElementById("mutationRate").value) / 100;
+    Math.max(
+      0,
+      parseFloat(document.getElementById("mutationRate").value) || 10,
+    ) / 100;
 
-  // Retorna o alvo para o centro da tela
   target = { x: width / 2, y: height / 2 };
 
   historyData = runGA(popSize, maxGen, patience, crossoverRate, mutationRate);
 
-  timeline.max = historyData.length - 1;
+  timeline.max = Math.max(0, historyData.length - 1);
   timeline.value = 0;
+  exactTimelineValue = 0;
   timelineContainer.classList.remove("hidden");
 
   autoPlay = true;
-  playbackSpeed = (historyData.length - 1) / (durationSec * 1000);
+  playbackSpeed = Math.max(0, historyData.length - 1) / (durationSec * 1000);
   lastTime = 0;
 
   if (!isAnimating) {
@@ -222,8 +241,13 @@ closeMobileWarningBtn.addEventListener("click", () => {
   mobileWarningDialog.close();
 });
 
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                 (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && window.innerWidth < 1024);
+const isMobile =
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent,
+  ) ||
+  (navigator.maxTouchPoints &&
+    navigator.maxTouchPoints > 2 &&
+    window.innerWidth < 1024);
 if (isMobile) {
   mobileWarningDialog.showModal();
 }
@@ -233,13 +257,21 @@ function render(timestamp) {
   const deltaTime = timestamp - lastTime;
   lastTime = timestamp;
 
+  if (!historyData || historyData.length === 0) {
+    requestAnimationFrame(render);
+    return;
+  }
+
   if (autoPlay) {
-    let nextVal = parseFloat(timeline.value) + playbackSpeed * deltaTime;
-    if (nextVal >= timeline.max) {
-      nextVal = timeline.max;
+    exactTimelineValue += playbackSpeed * deltaTime;
+    const maxTimeline = parseFloat(timeline.max) || 0;
+    if (exactTimelineValue >= maxTimeline) {
+      exactTimelineValue = maxTimeline;
       autoPlay = false;
     }
-    timeline.value = nextVal;
+    timeline.value = exactTimelineValue;
+  } else {
+    exactTimelineValue = parseFloat(timeline.value) || 0;
   }
 
   ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
@@ -259,7 +291,7 @@ function render(timestamp) {
   ctx.fill();
   ctx.shadowBlur = 0;
 
-  const timeVal = parseFloat(timeline.value);
+  const timeVal = exactTimelineValue;
   const currentGenIdx = Math.floor(timeVal);
   const nextGenIdx = Math.min(currentGenIdx + 1, historyData.length - 1);
   const progress = timeVal - currentGenIdx;
@@ -283,7 +315,7 @@ function render(timestamp) {
     ctx.fillStyle = `hsl(${colorRatio * 180 + 180}, 100%, 60%)`;
     ctx.fill();
   }
-  
+
   ctx.restore();
 
   requestAnimationFrame(render);
