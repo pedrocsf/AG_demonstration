@@ -12,20 +12,28 @@
     <div id="ui-panel">
         <h2>Algoritmo Genético</h2>
         <div class="control-group">
-            <label for="popSize">População Inicial:</label>
+            <label for="popSize">População inicial:</label>
             <input type="number" id="popSize" value="150" min="10" max="1000">
         </div>
         <div class="control-group">
             <label for="maxGen">Máx. Gerações:</label>
-            <input type="number" id="maxGen" value="200" min="10" max="1000">
+            <input type="number" id="maxGen" value="20" min="1" max="1000">
         </div>
         <div class="control-group">
-            <label for="patience">Patience (Convergência):</label>
+            <label for="patience">Convergência:</label>
             <input type="number" id="patience" value="15" min="1" max="100">
         </div>
         <div class="control-group">
             <label for="duration">Tempo de Exibição (s):</label>
             <input type="number" id="duration" value="30" min="1" max="60">
+        </div>
+        <div class="control-group">
+            <label for="crossoverRate">Taxa de Crossover (%):</label>
+            <input type="number" id="crossoverRate" value="90" min="0" max="100">
+        </div>
+        <div class="control-group">
+            <label for="mutationRate">Taxa de Mutação (%):</label>
+            <input type="number" id="mutationRate" value="10" min="0" max="100">
         </div>
         <button id="startBtn">Iniciar evolução</button>
     </div>

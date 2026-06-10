@@ -38,7 +38,7 @@ class Individual {
   }
 }
 
-function runGA(popSize, maxGen, patience) {
+function runGA(popSize, maxGen, patience, crossoverRate, mutationRate) {
   let population = [];
   let localHistory = [];
 
@@ -94,10 +94,16 @@ function runGA(popSize, maxGen, patience) {
       let p1 = tournament(population);
       let p2 = tournament(population);
 
-      let childX = (p1.x + p2.x) / 2;
-      let childY = (p1.y + p2.y) / 2;
+      let childX, childY;
 
-      const mutationRate = 0.1;
+      if (Math.random() < crossoverRate) {
+        childX = (p1.x + p2.x) / 2;
+        childY = (p1.y + p2.y) / 2;
+      } else {
+        childX = p1.x;
+        childY = p1.y;
+      }
+
       if (Math.random() < mutationRate) {
         childX += (Math.random() - 0.5) * 100;
         childY += (Math.random() - 0.5) * 100;
@@ -121,8 +127,12 @@ btnStart.addEventListener("click", () => {
   const maxGen = parseInt(document.getElementById("maxGen").value);
   const patience = parseInt(document.getElementById("patience").value);
   const durationSec = parseFloat(document.getElementById("duration").value);
+  const crossoverRate =
+    parseFloat(document.getElementById("crossoverRate").value) / 100;
+  const mutationRate =
+    parseFloat(document.getElementById("mutationRate").value) / 100;
 
-  historyData = runGA(popSize, maxGen, patience);
+  historyData = runGA(popSize, maxGen, patience, crossoverRate, mutationRate);
 
   timeline.max = historyData.length - 1;
   timeline.value = 0;
@@ -130,14 +140,13 @@ btnStart.addEventListener("click", () => {
 
   autoPlay = true;
   playbackSpeed = (historyData.length - 1) / (durationSec * 1000);
-  lastTime = 0; 
+  lastTime = 0;
 
   if (!isAnimating) {
     isAnimating = true;
     requestAnimationFrame(render);
   }
 });
-
 
 timeline.addEventListener("input", () => {
   autoPlay = false;
@@ -166,7 +175,7 @@ function render(timestamp) {
   ctx.shadowBlur = 15;
   ctx.shadowColor = "#00ffcc";
   ctx.fill();
-  ctx.shadowBlur = 0; 
+  ctx.shadowBlur = 0;
 
   const timeVal = parseFloat(timeline.value);
   const currentGenIdx = Math.floor(timeVal);
