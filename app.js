@@ -42,6 +42,8 @@ function runGA(popSize, maxGen, patience, crossoverRate, mutationRate) {
   let population = [];
   let localHistory = [];
 
+  let targetConvergenceGen = Math.max(3, Math.floor(Math.random() * maxGen));
+
   for (let i = 0; i < popSize; i++) {
     population.push(new Individual());
   }
@@ -114,7 +116,7 @@ function runGA(popSize, maxGen, patience, crossoverRate, mutationRate) {
         childX = minX - rangeX * 0.25 + Math.random() * (rangeX * 1.5);
         childY = minY - rangeY * 0.25 + Math.random() * (rangeY * 1.5);
 
-        let maxStep = Math.max(width, height) / (maxGen * 0.3);
+        let maxStep = Math.max(width, height) / targetConvergenceGen;
         let dx = childX - p1.x;
         let dy = childY - p1.y;
         let dist = Math.sqrt(dx * dx + dy * dy);
@@ -129,7 +131,7 @@ function runGA(popSize, maxGen, patience, crossoverRate, mutationRate) {
       }
 
       if (Math.random() < mutationRate) {
-        let mutationPower = Math.max(width, height) / (maxGen * 0.3);
+        let mutationPower = Math.max(width, height) / targetConvergenceGen;
         childX += (Math.random() - 0.5) * mutationPower * 2;
         childY += (Math.random() - 0.5) * mutationPower * 2;
       }
@@ -160,10 +162,8 @@ btnStart.addEventListener("click", () => {
   const mutationRate =
     parseFloat(document.getElementById("mutationRate").value) / 100;
 
-  target = {
-    x: 50 + Math.random() * (width - 100),
-    y: 50 + Math.random() * (height - 100),
-  };
+  // Retorna o alvo para o centro da tela
+  target = { x: width / 2, y: height / 2 };
 
   historyData = runGA(popSize, maxGen, patience, crossoverRate, mutationRate);
 
