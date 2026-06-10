@@ -255,7 +255,7 @@ function render(timestamp) {
   const nextData = historyData[nextGenIdx];
 
   genLabel.innerText = `Geração: ${currentData.gen}`;
-  fitnessLabel.innerText = `Melhor Fitness: ${currentData.bestFitness.toFixed(2)}`;
+  fitnessLabel.innerText = `Melhor Fitness (0 é o objetivo): ${currentData.bestFitness.toFixed(2)}`;
 
   for (let i = 0; i < currentData.population.length; i++) {
     const pCurrent = currentData.population[i];
