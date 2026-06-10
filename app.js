@@ -23,6 +23,8 @@ const timelineContainer = document.getElementById("timeline-container");
 const timeline = document.getElementById("timeline");
 const genLabel = document.getElementById("genLabel");
 const fitnessLabel = document.getElementById("fitnessLabel");
+const zoomSlider = document.getElementById("zoomSlider");
+const zoomValue = document.getElementById("zoomValue");
 
 class Individual {
   constructor(x, y) {
@@ -181,6 +183,10 @@ btnStart.addEventListener("click", () => {
   }
 });
 
+zoomSlider.addEventListener("input", () => {
+  zoomValue.innerText = zoomSlider.value + "%";
+});
+
 timeline.addEventListener("input", () => {
   autoPlay = false;
 });
@@ -201,6 +207,12 @@ function render(timestamp) {
 
   ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
   ctx.fillRect(0, 0, width, height);
+
+  const zoomLevel = parseFloat(zoomSlider.value) / 100;
+  ctx.save();
+  ctx.translate(width / 2, height / 2);
+  ctx.scale(zoomLevel, zoomLevel);
+  ctx.translate(-width / 2, -height / 2);
 
   ctx.beginPath();
   ctx.arc(target.x, target.y, 10, 0, Math.PI * 2);
@@ -234,6 +246,8 @@ function render(timestamp) {
     ctx.fillStyle = `hsl(${colorRatio * 180 + 180}, 100%, 60%)`;
     ctx.fill();
   }
+  
+  ctx.restore();
 
   requestAnimationFrame(render);
 }
