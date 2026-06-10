@@ -171,3 +171,73 @@ input[type=range] {
 .hidden {
     display: none !important;
 }
+
+.info-btn {
+    position: absolute;
+    bottom: 30px;
+    left: 20px;
+    width: auto;
+    padding: 10px 20px;
+    z-index: 10;
+    background: rgba(15, 20, 30, 0.85);
+    border: 1px solid #2a3b4c;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.info-btn:hover {
+    background: rgba(30, 45, 65, 0.95);
+}
+
+.custom-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(15, 20, 30, 0.95);
+    border: 1px solid #2a3b4c;
+    padding: 30px;
+    border-radius: 8px;
+    width: 450px;
+    text-align: center;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    z-index: 100;
+}
+
+.custom-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(3px);
+}
+
+.logo-container {
+    background: #ffffff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.dialog-logo {
+    max-width: 250px;
+    display: block;
+}
+
+.custom-dialog h3 {
+    color: #00e5ff;
+    margin-bottom: 15px;
+}
+
+.custom-dialog p {
+    color: #d0e0f0;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+
+.close-btn {
+    background: #cc3333;
+}
+
+.close-btn:hover {
+    background: #ff4444;
+}

@@ -25,6 +25,14 @@ const genLabel = document.getElementById("genLabel");
 const fitnessLabel = document.getElementById("fitnessLabel");
 const zoomSlider = document.getElementById("zoomSlider");
 const zoomValue = document.getElementById("zoomValue");
+const crossoverRateSlider = document.getElementById("crossoverRate");
+const crossoverValue = document.getElementById("crossoverValue");
+const mutationRateSlider = document.getElementById("mutationRate");
+const mutationValue = document.getElementById("mutationValue");
+
+const infoBtn = document.getElementById("infoBtn");
+const infoDialog = document.getElementById("infoDialog");
+const closeDialogBtn = document.getElementById("closeDialogBtn");
 
 class Individual {
   constructor(x, y) {
@@ -187,8 +195,24 @@ zoomSlider.addEventListener("input", () => {
   zoomValue.innerText = zoomSlider.value + "%";
 });
 
+crossoverRateSlider.addEventListener("input", () => {
+  crossoverValue.innerText = crossoverRateSlider.value + "%";
+});
+
+mutationRateSlider.addEventListener("input", () => {
+  mutationValue.innerText = mutationRateSlider.value + "%";
+});
+
 timeline.addEventListener("input", () => {
   autoPlay = false;
+});
+
+infoBtn.addEventListener("click", () => {
+  infoDialog.showModal();
+});
+
+closeDialogBtn.addEventListener("click", () => {
+  infoDialog.close();
 });
 
 function render(timestamp) {
