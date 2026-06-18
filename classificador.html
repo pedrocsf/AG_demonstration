@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classificador Genético — Diabetes (Pima)</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="classificador.css">
+</head>
+
+<body class="classificador-page">
+    <header id="cls-header">
+        <div class="cls-title">
+            <a href="index.html" class="cls-back" title="Voltar à demonstração visual">←</a>
+            <div>
+                <h1>Classificador Genético</h1>
+                <p>Evolução de uma regra de decisão interpretável — dataset Pima Indians Diabetes</p>
+            </div>
+        </div>
+        <div id="cls-status">Configure os parâmetros e clique em "Iniciar evolução".</div>
+    </header>
+
+    <div id="cls-controls">
+        <div class="control-group">
+            <label for="clsPop">População:</label>
+            <input type="number" id="clsPop" value="80" min="10" max="500">
+        </div>
+        <div class="control-group">
+            <label for="clsGen">Máx. gerações:</label>
+            <input type="number" id="clsGen" value="150" min="1" max="1000">
+        </div>
+        <div class="control-group">
+            <label for="clsPatience">Convergência:</label>
+            <input type="number" id="clsPatience" value="25" min="1" max="200">
+        </div>
+        <div class="control-group">
+            <label for="clsCrossover">Crossover: <span id="clsCrossoverVal">80%</span></label>
+            <input type="range" id="clsCrossover" value="80" min="0" max="100" step="1">
+        </div>
+        <div class="control-group">
+            <label for="clsMutation">Mutação: <span id="clsMutationVal">2%</span></label>
+            <input type="range" id="clsMutation" value="2" min="0" max="20" step="1">
+        </div>
+        <div class="control-group">
+            <label for="clsSpeed">Velocidade: <span id="clsSpeedVal">12 ger/s</span></label>
+            <input type="range" id="clsSpeed" value="12" min="1" max="40" step="1">
+        </div>
+        <button id="clsStartBtn">Iniciar evolução</button>
+    </div>
+
+    <main id="cls-dashboard">
+        <!-- Curva de fitness -->
+        <section class="cls-card">
+            <h2>Evolução do Fitness (F1-macro via validação cruzada)</h2>
+            <canvas id="fitnessCanvas"></canvas>
+            <div class="cls-legend-inline">
+                <span><i class="dot dot-best"></i> Melhor global</span>
+                <span><i class="dot dot-avg"></i> Média da população</span>
+            </div>
+        </section>
+
+        <!-- Histograma de scores -->
+        <section class="cls-card">
+            <h2>Separação dos scores no teste &amp; limiar de inferência <em>k</em></h2>
+            <canvas id="histCanvas"></canvas>
+            <div class="cls-legend-inline">
+                <span><i class="dot dot-healthy"></i> Saudável (0)</span>
+                <span><i class="dot dot-diab"></i> Diabético (1)</span>
+                <span><i class="dot dot-k"></i> limiar k</span>
+            </div>
+        </section>
+
+        <!-- Regra de decisão evoluída -->
+        <section class="cls-card cls-rule">
+            <h2>Regra de decisão do melhor indivíduo</h2>
+            <p class="cls-rule-intro">SE (soma ponderada das condições satisfeitas / peso total) &ge;
+                <strong id="kValue">0.000</strong> ENTÃO <strong>Diabetes</strong></p>
+            <div class="rule-kbar"><span class="rule-kfill" id="kFill"></span></div>
+            <div class="rule-head">
+                <span>Atributo</span><span>cond.</span><span>limiar</span><span>peso (w)</span><span></span>
+            </div>
+            <div id="ruleRows"></div>
+            <p class="cls-hint">Atributos apagados foram <em>desativados</em> (gene de seleção s = 0) pela evolução.</p>
+        </section>
+
+        <!-- Métricas de teste -->
+        <section class="cls-card cls-metrics">
+            <h2>Desempenho no conjunto de teste (20%)</h2>
+            <div class="metrics-grid">
+                <div class="metric"><span id="mAcc">—</span><label>Acurácia</label></div>
+                <div class="metric"><span id="mF1">—</span><label>F1-macro</label></div>
+                <div class="metric"><span id="mPrec">—</span><label>Precisão (diab.)</label></div>
+                <div class="metric"><span id="mRec">—</span><label>Recall (diab.)</label></div>
+            </div>
+            <h3>Matriz de confusão</h3>
+            <table class="cm">
+                <tr><th></th><th>Prev. 0</th><th>Prev. 1</th></tr>
+                <tr><th>Real 0</th><td class="cm-ok" id="cmTN">—</td><td class="cm-bad" id="cmFP">—</td></tr>
+                <tr><th>Real 1</th><td class="cm-bad" id="cmFN">—</td><td class="cm-ok" id="cmTP">—</td></tr>
+            </table>
+        </section>
+    </main>
+
+    <script src="classificador.js"></script>
+</body>
+
+</html>

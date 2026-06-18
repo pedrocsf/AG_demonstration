@@ -241,3 +241,23 @@ input[type=range] {
 .close-btn:hover {
     background: #ff4444;
 }
+
+/* Link de acesso ao classificador genético */
+.cross-link {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(138, 109, 255, 0.18);
+    border: 1px solid #5a4b9c;
+    color: #c9bcff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.cross-link:hover {
+    background: rgba(138, 109, 255, 0.32);
+}
