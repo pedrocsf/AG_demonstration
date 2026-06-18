@@ -15,20 +15,32 @@
     <div id="loading-screen">
         <div class="ls-content">
             <div class="dna-wrap">
-                <div class="dna-rung" style="--i:0"><span class="s1"></span><span class="bar"></span><span class="s2"></span></div>
-                <div class="dna-rung" style="--i:1"><span class="s1"></span><span class="bar"></span><span class="s2"></span></div>
-                <div class="dna-rung" style="--i:2"><span class="s1"></span><span class="bar"></span><span class="s2"></span></div>
-                <div class="dna-rung" style="--i:3"><span class="s1"></span><span class="bar"></span><span class="s2"></span></div>
-                <div class="dna-rung" style="--i:4"><span class="s1"></span><span class="bar"></span><span class="s2"></span></div>
-                <div class="dna-rung" style="--i:5"><span class="s1"></span><span class="bar"></span><span class="s2"></span></div>
-                <div class="dna-rung" style="--i:6"><span class="s1"></span><span class="bar"></span><span class="s2"></span></div>
-                <div class="dna-rung" style="--i:7"><span class="s1"></span><span class="bar"></span><span class="s2"></span></div>
-                <div class="dna-rung" style="--i:8"><span class="s1"></span><span class="bar"></span><span class="s2"></span></div>
-                <div class="dna-rung" style="--i:9"><span class="s1"></span><span class="bar"></span><span class="s2"></span></div>
+                <div class="dna-rung" style="--i:0"><span class="s1"></span><span class="bar"></span><span
+                        class="s2"></span></div>
+                <div class="dna-rung" style="--i:1"><span class="s1"></span><span class="bar"></span><span
+                        class="s2"></span></div>
+                <div class="dna-rung" style="--i:2"><span class="s1"></span><span class="bar"></span><span
+                        class="s2"></span></div>
+                <div class="dna-rung" style="--i:3"><span class="s1"></span><span class="bar"></span><span
+                        class="s2"></span></div>
+                <div class="dna-rung" style="--i:4"><span class="s1"></span><span class="bar"></span><span
+                        class="s2"></span></div>
+                <div class="dna-rung" style="--i:5"><span class="s1"></span><span class="bar"></span><span
+                        class="s2"></span></div>
+                <div class="dna-rung" style="--i:6"><span class="s1"></span><span class="bar"></span><span
+                        class="s2"></span></div>
+                <div class="dna-rung" style="--i:7"><span class="s1"></span><span class="bar"></span><span
+                        class="s2"></span></div>
+                <div class="dna-rung" style="--i:8"><span class="s1"></span><span class="bar"></span><span
+                        class="s2"></span></div>
+                <div class="dna-rung" style="--i:9"><span class="s1"></span><span class="bar"></span><span
+                        class="s2"></span></div>
             </div>
-            <div class="ls-title">Estudo de caso</div>
+            <div class="ls-title">Classificador Genético</div>
             <div class="ls-sub">Carregando dataset Pima Indians Diabetes…</div>
-            <div class="ls-bar"><div class="ls-fill"></div></div>
+            <div class="ls-bar">
+                <div class="ls-fill"></div>
+            </div>
         </div>
     </div>
 
@@ -72,7 +84,6 @@
     </div>
 
     <main id="cls-dashboard">
-        <!-- Curva de fitness -->
         <section class="cls-card">
             <h2>Evolução do Fitness</h2>
             <canvas id="fitnessCanvas"></canvas>
@@ -82,7 +93,6 @@
             </div>
         </section>
 
-        <!-- Histograma de scores -->
         <section class="cls-card">
             <h2>Distribuição dos scores por classe real</h2>
             <canvas id="histCanvas"></canvas>
@@ -94,11 +104,11 @@
             </div>
         </section>
 
-        <!-- Regra de decisão evoluída -->
         <section class="cls-card cls-rule">
             <h2>Regra de decisão do melhor indivíduo</h2>
             <p class="cls-rule-intro">SE (soma ponderada das condições satisfeitas / peso total) &ge;
-                <strong id="kValue">0.000</strong> ENTÃO <strong>Diabetes</strong></p>
+                <strong id="kValue">0.000</strong> ENTÃO <strong>Diabetes</strong>
+            </p>
             <div class="rule-kbar"><span class="rule-kfill" id="kFill"></span></div>
             <div class="rule-head">
                 <span>Atributo</span><span>cond.</span><span>limiar</span><span>peso (w)</span><span></span>
@@ -107,7 +117,6 @@
             <p class="cls-hint">Atributos apagados foram <em>desativados</em> (gene de seleção s = 0) pela evolução.</p>
         </section>
 
-        <!-- Métricas de teste -->
         <section class="cls-card cls-metrics">
             <h2>Desempenho no conjunto de teste (20%)</h2>
             <div class="metrics-grid">
@@ -118,9 +127,21 @@
             </div>
             <h3>Matriz de confusão</h3>
             <table class="cm">
-                <tr><th></th><th>Prev. 0</th><th>Prev. 1</th></tr>
-                <tr><th>Real 0</th><td class="cm-ok" id="cmTN">—</td><td class="cm-bad" id="cmFP">—</td></tr>
-                <tr><th>Real 1</th><td class="cm-bad" id="cmFN">—</td><td class="cm-ok" id="cmTP">—</td></tr>
+                <tr>
+                    <th></th>
+                    <th>Prev. 0</th>
+                    <th>Prev. 1</th>
+                </tr>
+                <tr>
+                    <th>Real 0</th>
+                    <td class="cm-ok" id="cmTN">—</td>
+                    <td class="cm-bad" id="cmFP">—</td>
+                </tr>
+                <tr>
+                    <th>Real 1</th>
+                    <td class="cm-bad" id="cmFN">—</td>
+                    <td class="cm-ok" id="cmTP">—</td>
+                </tr>
             </table>
         </section>
     </main>

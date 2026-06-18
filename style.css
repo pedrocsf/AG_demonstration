@@ -127,7 +127,6 @@ button:hover {
     color: #ffffff;
 }
 
-/* Estilização da barra de rolagem para combinar com o tema escuro */
 #legend-panel::-webkit-scrollbar {
     width: 6px;
 }
@@ -272,7 +271,6 @@ input[type=range] {
     gap: 28px;
 }
 
-/* ---- DNA double helix ---- */
 .dna-wrap {
     display: flex;
     flex-direction: column;
@@ -330,7 +328,6 @@ input[type=range] {
     50%       { opacity: 0.2; transform: scaleX(0.5); }
 }
 
-/* ---- Texto ---- */
 .ls-title {
     font-size: 1.8rem;
     font-weight: 700;
@@ -346,7 +343,6 @@ input[type=range] {
     margin-top: -18px;
 }
 
-/* ---- Barra de progresso ---- */
 .ls-bar {
     width: 220px;
     height: 3px;
@@ -370,7 +366,6 @@ input[type=range] {
     100% { width: 100%; }
 }
 
-/* Link de acesso ao classificador genético */
 .cross-link {
     display: block;
     text-align: center;

@@ -1,11 +1,3 @@
-// ============================================================
-// Demonstração ao vivo do Classificador Genético (Pima Diabetes)
-// Porte fiel de preparacao_de_dados.py + classificador.py para o navegador.
-// A evolução roda geração a geração dentro de um loop de animação,
-// permitindo "assistir" o algoritmo aprender a regra de decisão.
-// ============================================================
-
-// ---------- Utilidades numéricas e RNG semeado ----------
 function mulberry32(seed) {
   let a = seed >>> 0;
   return function () {
@@ -17,11 +9,9 @@ function mulberry32(seed) {
   };
 }
 
-// RNG global da execução (resemeado a cada "Iniciar")
 let rng = mulberry32(Date.now());
 
 function gauss(mu, sigma) {
-  // Box-Muller
   let u = 0,
     v = 0;
   while (u === 0) u = rng();
@@ -44,7 +34,6 @@ function shuffle(arr, r) {
   return a;
 }
 
-// ---------- Metadados das 8 features ----------
 const FEATURE_NAMES = [
   "Pregnancies",
   "Glucose",
@@ -68,9 +57,6 @@ const FEATURE_PT = [
 const N_FEATURES = 8;
 const COLS_TO_IMPUTE = [1, 2, 3, 4, 5];
 
-// ============================================================
-// 1. PREPARAÇÃO DE DADOS (porte de preparacao_de_dados.py)
-// ============================================================
 const DATA_URL =
   "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv";
 
@@ -132,7 +118,6 @@ function kFoldEstratificado(yTrain, k, r) {
 }
 
 function prepararDados(rawX, rawY, r) {
-  // Split estratificado 80/20
   const [trainIdx, testIdx] = dividirEstratificado(rawY, 0.2, r);
 
   const Xtr = trainIdx.map((i) => rawX[i].slice());
@@ -140,7 +125,6 @@ function prepararDados(rawX, rawY, r) {
   const yTrain = trainIdx.map((i) => rawY[i]);
   const yTest = testIdx.map((i) => rawY[i]);
 
-  // Imputação da mediana (exclusiva do treino)
   const medians = {};
   for (const c of COLS_TO_IMPUTE) {
     medians[c] = medianaSemZeros(Xtr.map((row) => row[c]));
@@ -150,7 +134,6 @@ function prepararDados(rawX, rawY, r) {
   for (const row of Xte)
     for (const c of COLS_TO_IMPUTE) if (row[c] === 0) row[c] = medians[c];
 
-  // Normalização (StandardScaler, ddof=0) ajustada no treino
   const means = new Array(N_FEATURES).fill(0);
   const stds = new Array(N_FEATURES).fill(0);
   for (let c = 0; c < N_FEATURES; c++) {
@@ -160,15 +143,13 @@ function prepararDados(rawX, rawY, r) {
   }
   const scale = (row) => row.map((v, c) => (v - means[c]) / stds[c]);
   const XtrScaled = Xtr.map(scale);
-  const XteScaled = Xte.map(scale); // teste já imputado + escalonado
+  const XteScaled = Xte.map(scale);
 
-  // Limites para inicialização de t e folds de CV
   const tBounds = [];
   for (let c = 0; c < N_FEATURES; c++) {
     const col = XtrScaled.map((row) => row[c]);
     tBounds.push([Math.min(...col), Math.max(...col)]);
   }
-  const stdsTrain = new Array(N_FEATURES).fill(1); // após scaler ~1
   const cvFolds = kFoldEstratificado(yTrain, 5, r);
 
   return {
@@ -178,15 +159,11 @@ function prepararDados(rawX, rawY, r) {
     yTest,
     cvFolds,
     tBounds,
-    stdsTrain,
     means,
     stds,
   };
 }
 
-// ============================================================
-// 2. INDIVÍDUO E OPERADORES GENÉTICOS (porte de classificador.py)
-// ============================================================
 function novoIndividuo(tBounds) {
   return {
     s: Array.from({ length: N_FEATURES }, () => (rng() < 0.5 ? 0 : 1)),
@@ -213,7 +190,6 @@ function crossover(p1, p2, crossoverRate) {
   if (rng() < crossoverRate) {
     const c1 = copiar(p1),
       c2 = copiar(p2);
-    // Cruzamento de 1 ponto para genes binários (s + d concatenados)
     const bin1 = [...p1.s, ...p1.d];
     const bin2 = [...p2.s, ...p2.d];
     const cp = 1 + Math.floor(rng() * 15);
@@ -224,7 +200,6 @@ function crossover(p1, p2, crossoverRate) {
     c2.s = nb2.slice(0, 8);
     c2.d = nb2.slice(8, 16);
 
-    // BLX-alpha para valores reais (t e w)
     const alpha = 0.5;
     for (let i = 0; i < N_FEATURES; i++) {
       let cmin = Math.min(p1.t[i], p2.t[i]),
@@ -246,7 +221,6 @@ function crossover(p1, p2, crossoverRate) {
         1,
       );
     }
-    // BLX-alpha para o limiar de inferência k
     let kmin = Math.min(p1.k, p2.k),
       kmax = Math.max(p1.k, p2.k);
     let kdiff = kmax - kmin;
@@ -257,17 +231,16 @@ function crossover(p1, p2, crossoverRate) {
   return [copiar(p1), copiar(p2)];
 }
 
-function mutate(ind, stdsTrain, mutationRate) {
+function mutate(ind, mutationRate) {
   for (let i = 0; i < N_FEATURES; i++) {
     if (rng() < mutationRate) ind.s[i] = 1 - ind.s[i];
     if (rng() < mutationRate) ind.d[i] = 1 - ind.d[i];
-    if (rng() < mutationRate) ind.t[i] += gauss(0, stdsTrain[i]);
+    if (rng() < mutationRate) ind.t[i] += gauss(0, 1);
     if (rng() < mutationRate) ind.w[i] = clip(ind.w[i] + gauss(0, 0.1), 0, 1);
   }
   if (rng() < mutationRate) ind.k = clip(ind.k + gauss(0, 0.1), 0, 1);
 }
 
-// ---------- Função objetivo (porte de calcular_aptidao) ----------
 function calcularAptidao(ind, X, y, cvFolds) {
   const { s, t, d, k, w } = ind;
   if (sum(s) === 0) return 0.0;
@@ -318,7 +291,6 @@ function f1Macro(yTrue, yPred) {
   return total / 2;
 }
 
-// ---------- Inferência no conjunto de teste (porte de predict) ----------
 function pontuarTeste(ind, Xte) {
   const { s, t, d, k, w } = ind;
   const activeW = w.map((wi, i) => (s[i] === 1 ? wi : 0));
@@ -340,13 +312,10 @@ function pontuarTeste(ind, Xte) {
   return { scores, preds, k };
 }
 
-// ============================================================
-// 3. ESTADO DA EVOLUÇÃO E LAÇO DE ANIMAÇÃO
-// ============================================================
 const ui = {};
-let DATA = null; // dados crus carregados uma vez
-let PREP = null; // dados preparados da execução atual
-let state = null; // estado da evolução em andamento
+let DATA = null;
+let PREP = null;
+let state = null;
 let rafId = null;
 
 function setStatus(msg) {
@@ -383,7 +352,6 @@ function iniciarEvolucao(cfg) {
 function passoGeracao() {
   const { pop, cfg } = state;
 
-  // Avaliação
   for (const ind of pop) {
     if (ind.fitness === -1.0)
       ind.fitness = calcularAptidao(
@@ -406,22 +374,20 @@ function passoGeracao() {
   state.bestHist.push(state.bestFitnessGlobal);
   state.avgHist.push(mean(pop.map((p) => p.fitness)));
 
-  // Critérios de parada
   const parar = state.semMelhora >= cfg.patience || state.gen >= cfg.maxGen - 1;
   if (parar) {
     state.running = false;
     return;
   }
 
-  // Nova população: elitismo + torneio + crossover + mutação
   const elite = Math.min(10, Math.floor(cfg.popSize * 0.1)) || 1;
   const novo = pop.slice(0, elite).map(copiar);
   while (novo.length < cfg.popSize) {
     const t1 = torneio(pop);
     const t2 = torneio(pop);
     const [c1, c2] = crossover(t1, t2, cfg.crossoverRate);
-    mutate(c1, PREP.stdsTrain, cfg.mutationRate);
-    mutate(c2, PREP.stdsTrain, cfg.mutationRate);
+    mutate(c1, cfg.mutationRate);
+    mutate(c2, cfg.mutationRate);
     c1.fitness = -1.0;
     c2.fitness = -1.0;
     novo.push(c1, c2);
@@ -458,9 +424,6 @@ function loop(ts) {
   }
 }
 
-// ============================================================
-// 4. RENDERIZAÇÃO
-// ============================================================
 function desenharTudo() {
   const best = state.bestGlobal;
   if (!best) return;
@@ -505,7 +468,6 @@ function desenharFitness() {
   const n = state.bestHist.length;
   const maxX = Math.max(state.cfg.maxGen, 1);
 
-  // grade + eixos
   ctx.strokeStyle = "rgba(120,150,180,0.15)";
   ctx.fillStyle = "#7790a5";
   ctx.font = "10px Segoe UI";
@@ -536,7 +498,6 @@ function desenharFitness() {
   drawLine(state.avgHist, "#8a6dff", 1.5);
   drawLine(state.bestHist, "#00e5ff", 2);
 
-  // marcador do melhor atual
   if (n > 0) {
     const v = state.bestHist[n - 1];
     ctx.fillStyle = "#00e5ff";
@@ -571,7 +532,6 @@ function atualizarRegra(best) {
     const row = rows[i];
     const ativo = best.s[i] === 1;
     row.classList.toggle("inactive", !ativo);
-    // limiar em unidades originais (inverso do StandardScaler)
     const tOrig = best.t[i] * PREP.stds[i] + PREP.means[i];
     row.querySelector(".rule-op").textContent = ativo
       ? best.d[i] === 1
@@ -589,8 +549,6 @@ function atualizarRegra(best) {
   ui.kFill.style.width = (best.k * 100).toFixed(0) + "%";
 }
 
-// Strip plot: cada paciente é um ponto, duas faixas (real 0 / real 1).
-// Corretos = preenchidos, errados (FP/FN) = contorno vermelho/laranja.
 function desenharHistograma(teste) {
   const { ctx, w, h } = fitCanvas(ui.histCanvas);
   ctx.clearRect(0, 0, w, h);
@@ -602,12 +560,9 @@ function desenharHistograma(teste) {
   const plotW = w - padL - padR;
   const plotH = h - padT - padB;
 
-  // Duas faixas horizontais: topo = saudável (0), baixo = diabético (1)
   const laneH = plotH / 2;
-  const lane = [padT + laneH * 0.5, padT + laneH * 1.5]; // centro de cada faixa
+  const lane = [padT + laneH * 0.5, padT + laneH * 1.5];
 
-
-  // Divisória entre faixas
   ctx.strokeStyle = "rgba(255,255,255,0.07)";
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -615,10 +570,8 @@ function desenharHistograma(teste) {
   ctx.lineTo(w - padR, padT + laneH);
   ctx.stroke();
 
-  // Jitter vertical determinístico por paciente (sem aleatoriedade a cada frame)
   const jitterAmp = laneH * 0.36;
   const jitter = (i) => {
-    // hash simples: distribui uniformemente dentro da faixa
     const h = Math.sin(i * 127.1 + 311.7) * 43758.5453;
     return (h - Math.floor(h) - 0.5) * 2 * jitterAmp;
   };
@@ -637,12 +590,10 @@ function desenharHistograma(teste) {
     ctx.arc(cx, cy, R, 0, Math.PI * 2);
 
     if (correto) {
-      // TN (azul) ou TP (rosa)
       ctx.fillStyle =
         realClass === 0 ? "rgba(0,229,255,0.65)" : "rgba(255,99,132,0.75)";
       ctx.fill();
     } else {
-      // FP ou FN: contorno laranja destacado, interior semitransparente
       ctx.fillStyle = "rgba(255,180,0,0.18)";
       ctx.fill();
       ctx.strokeStyle = "#ffb300";
@@ -651,7 +602,6 @@ function desenharHistograma(teste) {
     }
   });
 
-  // Linha vertical do limiar k
   const kx = px(teste.k);
   ctx.strokeStyle = "#ffd166";
   ctx.lineWidth = 2;
@@ -662,14 +612,12 @@ function desenharHistograma(teste) {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Rótulo do k
   const kLabel = "k=" + teste.k.toFixed(2);
   ctx.font = "10px Segoe UI";
   ctx.fillStyle = "#ffd166";
   const kLabelX = kx + 5 + 36 > w - padR ? kx - 40 : kx + 5;
   ctx.fillText(kLabel, kLabelX, padT + 10);
 
-  // Eixo X: linha base + ticks em 0, 0.25, 0.5, 0.75, 1
   ctx.strokeStyle = "rgba(120,150,180,0.3)";
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -715,9 +663,6 @@ function atualizarMetricas(teste) {
   ui.mRec.textContent = (rec * 100).toFixed(1) + "%";
 }
 
-// ============================================================
-// 5. WIRING DA INTERFACE
-// ============================================================
 function bindUI() {
   ui.status = document.getElementById("cls-status");
   ui.dashboard = document.getElementById("cls-dashboard");
@@ -793,7 +738,6 @@ function bindUI() {
 document.addEventListener("DOMContentLoaded", () => {
   bindUI();
 
-  // Dismiss loading screen após a página estar pronta
   window.addEventListener("load", () => {
     setTimeout(() => {
       const ls = document.getElementById("loading-screen");
@@ -803,11 +747,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 2400);
   });
 
-  // Fade de saída ao voltar para index.html
   document.querySelector(".cls-back").addEventListener("click", (e) => {
     e.preventDefault();
     const href = e.currentTarget.href;
     document.querySelector(".classificador-page").classList.add("page-exit");
-    setTimeout(() => { window.location = href; }, 450);
+    setTimeout(() => {
+      window.location = href;
+    }, 450);
   });
 });
