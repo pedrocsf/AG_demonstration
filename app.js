@@ -237,6 +237,13 @@ timeline.addEventListener("input", () => {
   autoPlay = false;
 });
 
+document.querySelector(".cross-link").addEventListener("click", (e) => {
+  e.preventDefault();
+  const href = e.currentTarget.href;
+  document.body.classList.add("page-exit");
+  setTimeout(() => { window.location = href; }, 450);
+});
+
 infoBtn.addEventListener("click", () => {
   infoDialog.showModal();
 });

@@ -7,6 +7,11 @@
     background:
         radial-gradient(1200px 600px at 80% -10%, rgba(0, 136, 170, 0.12), transparent),
         #05080d;
+    transition: opacity 0.4s ease;
+}
+
+.classificador-page.page-exit {
+    opacity: 0;
 }
 
 #cls-header {

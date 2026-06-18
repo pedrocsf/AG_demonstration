@@ -790,4 +790,24 @@ function bindUI() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", bindUI);
+document.addEventListener("DOMContentLoaded", () => {
+  bindUI();
+
+  // Dismiss loading screen após a página estar pronta
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      const ls = document.getElementById("loading-screen");
+      if (!ls) return;
+      ls.classList.add("fade-out");
+      setTimeout(() => ls.remove(), 650);
+    }, 2400);
+  });
+
+  // Fade de saída ao voltar para index.html
+  document.querySelector(".cls-back").addEventListener("click", (e) => {
+    e.preventDefault();
+    const href = e.currentTarget.href;
+    document.querySelector(".classificador-page").classList.add("page-exit");
+    setTimeout(() => { window.location = href; }, 450);
+  });
+});
