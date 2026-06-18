@@ -607,19 +607,14 @@ function desenharHistograma(teste) {
   ctx.lineTo(padL + plotW, padT + plotH);
   ctx.stroke();
 
-  ctx.font = "10px Segoe UI";
-  ctx.fillStyle = "#7790a5";
-  ctx.textAlign = "center";
+  ctx.strokeStyle = "rgba(120,150,180,0.5)";
   for (const v of [0, 0.25, 0.5, 0.75, 1]) {
     const tx = padL + v * plotW;
     ctx.beginPath();
     ctx.moveTo(tx, padT + plotH);
     ctx.lineTo(tx, padT + plotH + 4);
-    ctx.strokeStyle = "rgba(120,150,180,0.5)";
     ctx.stroke();
-    ctx.fillText(v.toFixed(2).replace("0.00", "0").replace("1.00", "1"), tx, h - 6);
   }
-  ctx.textAlign = "left";
 }
 
 function atualizarMetricas(teste) {
