@@ -1,3 +1,11 @@
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const ls = document.getElementById("loading-screen");
+    ls.classList.add("fade-out");
+    setTimeout(() => ls.remove(), 650);
+  }, 2400);
+});
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
