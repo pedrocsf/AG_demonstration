@@ -18,14 +18,17 @@ function mulberry32(seed) {
 }
 
 // RNG global da execução (resemeado a cada "Iniciar")
-let rng = mulberry32(42);
+let rng = mulberry32(Date.now());
 
 function gauss(mu, sigma) {
   // Box-Muller
-  let u = 0, v = 0;
+  let u = 0,
+    v = 0;
   while (u === 0) u = rng();
   while (v === 0) v = rng();
-  return mu + sigma * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+  return (
+    mu + sigma * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v)
+  );
 }
 
 const clip = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
@@ -43,12 +46,24 @@ function shuffle(arr, r) {
 
 // ---------- Metadados das 8 features ----------
 const FEATURE_NAMES = [
-  "Pregnancies", "Glucose", "BloodPressure", "SkinThickness",
-  "Insulin", "BMI", "DiabetesPedigreeFunction", "Age",
+  "Pregnancies",
+  "Glucose",
+  "BloodPressure",
+  "SkinThickness",
+  "Insulin",
+  "BMI",
+  "DiabetesPedigreeFunction",
+  "Age",
 ];
 const FEATURE_PT = [
-  "Gestações", "Glicose", "Pressão arterial", "Espessura da pele",
-  "Insulina", "IMC", "Histórico familiar", "Idade",
+  "Gestações",
+  "Glicose",
+  "Pressão arterial",
+  "Espessura da pele",
+  "Insulina",
+  "IMC",
+  "Histórico familiar",
+  "Idade",
 ];
 const N_FEATURES = 8;
 const COLS_TO_IMPUTE = [1, 2, 3, 4, 5];
@@ -61,9 +76,11 @@ const DATA_URL =
 
 async function carregarDados() {
   const resp = await fetch(DATA_URL);
-  if (!resp.ok) throw new Error("Falha ao baixar o dataset (HTTP " + resp.status + ")");
+  if (!resp.ok)
+    throw new Error("Falha ao baixar o dataset (HTTP " + resp.status + ")");
   const text = await resp.text();
-  const X = [], y = [];
+  const X = [],
+    y = [];
   for (const line of text.trim().split(/\r?\n/)) {
     const parts = line.split(",").map(Number);
     if (parts.length < 9 || parts.some(isNaN)) continue;
@@ -82,8 +99,9 @@ function medianaSemZeros(values) {
 
 function dividirEstratificado(y, testFrac, r) {
   const byClass = {};
-  y.forEach((c, i) => ((byClass[c] = byClass[c] || []).push(i)));
-  let train = [], test = [];
+  y.forEach((c, i) => (byClass[c] = byClass[c] || []).push(i));
+  let train = [],
+    test = [];
   for (const c of Object.keys(byClass)) {
     const idxs = shuffle(byClass[c], r);
     const nTest = Math.round(idxs.length * testFrac);
@@ -95,14 +113,15 @@ function dividirEstratificado(y, testFrac, r) {
 
 function kFoldEstratificado(yTrain, k, r) {
   const byClass = {};
-  yTrain.forEach((c, i) => ((byClass[c] = byClass[c] || []).push(i)));
+  yTrain.forEach((c, i) => (byClass[c] = byClass[c] || []).push(i));
   const assign = new Array(yTrain.length);
   for (const c of Object.keys(byClass)) {
     shuffle(byClass[c], r).forEach((pos, j) => (assign[pos] = j % k));
   }
   const folds = [];
   for (let f = 0; f < k; f++) {
-    const train = [], val = [];
+    const train = [],
+      val = [];
     for (let i = 0; i < yTrain.length; i++) {
       if (assign[i] === f) val.push(i);
       else train.push(i);
@@ -126,8 +145,10 @@ function prepararDados(rawX, rawY, r) {
   for (const c of COLS_TO_IMPUTE) {
     medians[c] = medianaSemZeros(Xtr.map((row) => row[c]));
   }
-  for (const row of Xtr) for (const c of COLS_TO_IMPUTE) if (row[c] === 0) row[c] = medians[c];
-  for (const row of Xte) for (const c of COLS_TO_IMPUTE) if (row[c] === 0) row[c] = medians[c];
+  for (const row of Xtr)
+    for (const c of COLS_TO_IMPUTE) if (row[c] === 0) row[c] = medians[c];
+  for (const row of Xte)
+    for (const c of COLS_TO_IMPUTE) if (row[c] === 0) row[c] = medians[c];
 
   // Normalização (StandardScaler, ddof=0) ajustada no treino
   const means = new Array(N_FEATURES).fill(0);
@@ -151,8 +172,15 @@ function prepararDados(rawX, rawY, r) {
   const cvFolds = kFoldEstratificado(yTrain, 5, r);
 
   return {
-    XtrScaled, XteScaled, yTrain, yTest, cvFolds, tBounds, stdsTrain,
-    means, stds,
+    XtrScaled,
+    XteScaled,
+    yTrain,
+    yTest,
+    cvFolds,
+    tBounds,
+    stdsTrain,
+    means,
+    stds,
   };
 }
 
@@ -172,37 +200,55 @@ function novoIndividuo(tBounds) {
 
 function copiar(ind) {
   return {
-    s: ind.s.slice(), d: ind.d.slice(), t: ind.t.slice(),
-    w: ind.w.slice(), k: ind.k, fitness: ind.fitness,
+    s: ind.s.slice(),
+    d: ind.d.slice(),
+    t: ind.t.slice(),
+    w: ind.w.slice(),
+    k: ind.k,
+    fitness: ind.fitness,
   };
 }
 
 function crossover(p1, p2, crossoverRate) {
   if (rng() < crossoverRate) {
-    const c1 = copiar(p1), c2 = copiar(p2);
+    const c1 = copiar(p1),
+      c2 = copiar(p2);
     // Cruzamento de 1 ponto para genes binários (s + d concatenados)
     const bin1 = [...p1.s, ...p1.d];
     const bin2 = [...p2.s, ...p2.d];
     const cp = 1 + Math.floor(rng() * 15);
     const nb1 = bin1.slice(0, cp).concat(bin2.slice(cp));
     const nb2 = bin2.slice(0, cp).concat(bin1.slice(cp));
-    c1.s = nb1.slice(0, 8); c1.d = nb1.slice(8, 16);
-    c2.s = nb2.slice(0, 8); c2.d = nb2.slice(8, 16);
+    c1.s = nb1.slice(0, 8);
+    c1.d = nb1.slice(8, 16);
+    c2.s = nb2.slice(0, 8);
+    c2.d = nb2.slice(8, 16);
 
     // BLX-alpha para valores reais (t e w)
     const alpha = 0.5;
     for (let i = 0; i < N_FEATURES; i++) {
-      let cmin = Math.min(p1.t[i], p2.t[i]), cmax = Math.max(p1.t[i], p2.t[i]);
+      let cmin = Math.min(p1.t[i], p2.t[i]),
+        cmax = Math.max(p1.t[i], p2.t[i]);
       let diff = cmax - cmin;
       c1.t[i] = cmin - alpha * diff + rng() * (diff * (1 + 2 * alpha));
       c2.t[i] = cmin - alpha * diff + rng() * (diff * (1 + 2 * alpha));
-      let wmin = Math.min(p1.w[i], p2.w[i]), wmax = Math.max(p1.w[i], p2.w[i]);
+      let wmin = Math.min(p1.w[i], p2.w[i]),
+        wmax = Math.max(p1.w[i], p2.w[i]);
       let wdiff = wmax - wmin;
-      c1.w[i] = clip(wmin - alpha * wdiff + rng() * (wdiff * (1 + 2 * alpha)), 0, 1);
-      c2.w[i] = clip(wmin - alpha * wdiff + rng() * (wdiff * (1 + 2 * alpha)), 0, 1);
+      c1.w[i] = clip(
+        wmin - alpha * wdiff + rng() * (wdiff * (1 + 2 * alpha)),
+        0,
+        1,
+      );
+      c2.w[i] = clip(
+        wmin - alpha * wdiff + rng() * (wdiff * (1 + 2 * alpha)),
+        0,
+        1,
+      );
     }
     // BLX-alpha para o limiar de inferência k
-    let kmin = Math.min(p1.k, p2.k), kmax = Math.max(p1.k, p2.k);
+    let kmin = Math.min(p1.k, p2.k),
+      kmax = Math.max(p1.k, p2.k);
     let kdiff = kmax - kmin;
     c1.k = clip(kmin - alpha * kdiff + rng() * (kdiff * (1 + 2 * alpha)), 0, 1);
     c2.k = clip(kmin - alpha * kdiff + rng() * (kdiff * (1 + 2 * alpha)), 0, 1);
@@ -231,13 +277,15 @@ function calcularAptidao(ind, X, y, cvFolds) {
 
   const f1s = [];
   for (const [, valIdx] of cvFolds) {
-    const yval = [], preds = [];
+    const yval = [],
+      preds = [];
     for (const idx of valIdx) {
       const x = X[idx];
       let score = 0;
       for (let i = 0; i < N_FEATURES; i++) {
         if (s[i] === 1) {
-          const met = (d[i] === 1 && x[i] > t[i]) || (d[i] === 0 && x[i] < t[i]);
+          const met =
+            (d[i] === 1 && x[i] > t[i]) || (d[i] === 0 && x[i] < t[i]);
           if (met) score += activeW[i];
         }
       }
@@ -253,9 +301,12 @@ function calcularAptidao(ind, X, y, cvFolds) {
 function f1Macro(yTrue, yPred) {
   let total = 0;
   for (const c of [0, 1]) {
-    let tp = 0, fp = 0, fn = 0;
+    let tp = 0,
+      fp = 0,
+      fn = 0;
     for (let i = 0; i < yTrue.length; i++) {
-      const p = yPred[i] === c, a = yTrue[i] === c;
+      const p = yPred[i] === c,
+        a = yTrue[i] === c;
       if (p && a) tp++;
       else if (p && !a) fp++;
       else if (!p && a) fn++;
@@ -272,7 +323,8 @@ function pontuarTeste(ind, Xte) {
   const { s, t, d, k, w } = ind;
   const activeW = w.map((wi, i) => (s[i] === 1 ? wi : 0));
   const totalWeight = sum(activeW);
-  const scores = [], preds = [];
+  const scores = [],
+    preds = [];
   for (const x of Xte) {
     let score = 0;
     for (let i = 0; i < N_FEATURES; i++) {
@@ -292,9 +344,9 @@ function pontuarTeste(ind, Xte) {
 // 3. ESTADO DA EVOLUÇÃO E LAÇO DE ANIMAÇÃO
 // ============================================================
 const ui = {};
-let DATA = null;          // dados crus carregados uma vez
-let PREP = null;          // dados preparados da execução atual
-let state = null;         // estado da evolução em andamento
+let DATA = null; // dados crus carregados uma vez
+let PREP = null; // dados preparados da execução atual
+let state = null; // estado da evolução em andamento
 let rafId = null;
 
 function setStatus(msg) {
@@ -307,7 +359,9 @@ function iniciarEvolucao(cfg) {
   rng = mulberry32(42); // execução reprodutível
   PREP = prepararDados(DATA.X, DATA.y, rng);
 
-  const pop = Array.from({ length: cfg.popSize }, () => novoIndividuo(PREP.tBounds));
+  const pop = Array.from({ length: cfg.popSize }, () =>
+    novoIndividuo(PREP.tBounds),
+  );
 
   state = {
     cfg,
@@ -332,7 +386,12 @@ function passoGeracao() {
   // Avaliação
   for (const ind of pop) {
     if (ind.fitness === -1.0)
-      ind.fitness = calcularAptidao(ind, PREP.XtrScaled, PREP.yTrain, PREP.cvFolds);
+      ind.fitness = calcularAptidao(
+        ind,
+        PREP.XtrScaled,
+        PREP.yTrain,
+        PREP.cvFolds,
+      );
   }
   pop.sort((a, b) => b.fitness - a.fitness);
 
@@ -348,8 +407,7 @@ function passoGeracao() {
   state.avgHist.push(mean(pop.map((p) => p.fitness)));
 
   // Critérios de parada
-  const parar =
-    state.semMelhora >= cfg.patience || state.gen >= cfg.maxGen - 1;
+  const parar = state.semMelhora >= cfg.patience || state.gen >= cfg.maxGen - 1;
   if (parar) {
     state.running = false;
     return;
@@ -395,7 +453,7 @@ function loop(ts) {
     desenharTudo();
     setStatus(
       `Evolução concluída — Geração ${state.gen} | Melhor F1-macro (CV): ` +
-      state.bestFitnessGlobal.toFixed(4)
+        state.bestFitnessGlobal.toFixed(4),
     );
   }
 }
@@ -408,8 +466,10 @@ function desenharTudo() {
   if (!best) return;
   setStatus(
     `Geração ${state.gen} / ${state.cfg.maxGen}  •  ` +
-    `Melhor F1-macro (CV): ${state.bestFitnessGlobal.toFixed(4)}  •  ` +
-    (state.running ? `estagnação ${state.semMelhora}/${state.cfg.patience}` : "parado")
+      `Melhor F1-macro (CV): ${state.bestFitnessGlobal.toFixed(4)}  •  ` +
+      (state.running
+        ? `estagnação ${state.semMelhora}/${state.cfg.patience}`
+        : "parado"),
   );
   desenharFitness();
   atualizarRegra(best);
@@ -421,7 +481,10 @@ function desenharTudo() {
 function fitCanvas(canvas) {
   const r = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
-  if (canvas.width !== Math.round(r.width * dpr) || canvas.height !== Math.round(r.height * dpr)) {
+  if (
+    canvas.width !== Math.round(r.width * dpr) ||
+    canvas.height !== Math.round(r.height * dpr)
+  ) {
     canvas.width = Math.round(r.width * dpr);
     canvas.height = Math.round(r.height * dpr);
   }
@@ -433,8 +496,12 @@ function fitCanvas(canvas) {
 function desenharFitness() {
   const { ctx, w, h } = fitCanvas(ui.fitnessCanvas);
   ctx.clearRect(0, 0, w, h);
-  const padL = 38, padB = 22, padT = 12, padR = 10;
-  const plotW = w - padL - padR, plotH = h - padT - padB;
+  const padL = 38,
+    padB = 22,
+    padT = 12,
+    padR = 10;
+  const plotW = w - padL - padR,
+    plotH = h - padT - padB;
   const n = state.bestHist.length;
   const maxX = Math.max(state.cfg.maxGen, 1);
 
@@ -461,7 +528,9 @@ function desenharFitness() {
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
     ctx.beginPath();
-    arr.forEach((v, i) => (i === 0 ? ctx.moveTo(px(i), py(v)) : ctx.lineTo(px(i), py(v))));
+    arr.forEach((v, i) =>
+      i === 0 ? ctx.moveTo(px(i), py(v)) : ctx.lineTo(px(i), py(v)),
+    );
     ctx.stroke();
   };
   drawLine(state.avgHist, "#8a6dff", 1.5);
@@ -504,10 +573,17 @@ function atualizarRegra(best) {
     row.classList.toggle("inactive", !ativo);
     // limiar em unidades originais (inverso do StandardScaler)
     const tOrig = best.t[i] * PREP.stds[i] + PREP.means[i];
-    row.querySelector(".rule-op").textContent = ativo ? (best.d[i] === 1 ? ">" : "<") : "—";
+    row.querySelector(".rule-op").textContent = ativo
+      ? best.d[i] === 1
+        ? ">"
+        : "<"
+      : "—";
     row.querySelector(".rule-thr").textContent = ativo ? tOrig.toFixed(1) : "";
-    row.querySelector(".rule-wfill").style.width = (best.w[i] * 100).toFixed(0) + "%";
-    row.querySelector(".rule-wval").textContent = ativo ? best.w[i].toFixed(2) : "";
+    row.querySelector(".rule-wfill").style.width =
+      (best.w[i] * 100).toFixed(0) + "%";
+    row.querySelector(".rule-wval").textContent = ativo
+      ? best.w[i].toFixed(2)
+      : "";
   }
   ui.kValue.textContent = best.k.toFixed(3);
   ui.kFill.style.width = (best.k * 100).toFixed(0) + "%";
@@ -519,7 +595,10 @@ function desenharHistograma(teste) {
   const { ctx, w, h } = fitCanvas(ui.histCanvas);
   ctx.clearRect(0, 0, w, h);
 
-  const padL = 38, padR = 12, padT = 12, padB = 22;
+  const padL = 38,
+    padR = 12,
+    padT = 12,
+    padB = 22;
   const plotW = w - padL - padR;
   const plotH = h - padT - padB;
 
@@ -567,9 +646,8 @@ function desenharHistograma(teste) {
 
     if (correto) {
       // TN (azul) ou TP (rosa)
-      ctx.fillStyle = realClass === 0
-        ? "rgba(0,229,255,0.65)"
-        : "rgba(255,99,132,0.75)";
+      ctx.fillStyle =
+        realClass === 0 ? "rgba(0,229,255,0.65)" : "rgba(255,99,132,0.75)";
       ctx.fill();
     } else {
       // FP ou FN: contorno laranja destacado, interior semitransparente
@@ -618,8 +696,12 @@ function desenharHistograma(teste) {
 }
 
 function atualizarMetricas(teste) {
-  const y = PREP.yTest, p = teste.preds;
-  let tp = 0, tn = 0, fp = 0, fn = 0;
+  const y = PREP.yTest,
+    p = teste.preds;
+  let tp = 0,
+    tn = 0,
+    fp = 0,
+    fn = 0;
   for (let i = 0; i < y.length; i++) {
     if (y[i] === 1 && p[i] === 1) tp++;
     else if (y[i] === 0 && p[i] === 0) tn++;
@@ -683,12 +765,30 @@ function bindUI() {
       }
     }
     const cfg = {
-      popSize: clip(parseInt(document.getElementById("clsPop").value) || 80, 10, 500),
-      maxGen: clip(parseInt(document.getElementById("clsGen").value) || 150, 1, 1000),
-      patience: clip(parseInt(document.getElementById("clsPatience").value) || 25, 1, 200),
-      crossoverRate: (parseFloat(document.getElementById("clsCrossover").value) || 80) / 100,
-      mutationRate: (parseFloat(document.getElementById("clsMutation").value) || 2) / 100,
-      genPerSec: clip(parseFloat(document.getElementById("clsSpeed").value) || 12, 1, 60),
+      popSize: clip(
+        parseInt(document.getElementById("clsPop").value) || 80,
+        10,
+        500,
+      ),
+      maxGen: clip(
+        parseInt(document.getElementById("clsGen").value) || 150,
+        1,
+        1000,
+      ),
+      patience: clip(
+        parseInt(document.getElementById("clsPatience").value) || 25,
+        1,
+        200,
+      ),
+      crossoverRate:
+        (parseFloat(document.getElementById("clsCrossover").value) || 80) / 100,
+      mutationRate:
+        (parseFloat(document.getElementById("clsMutation").value) || 2) / 100,
+      genPerSec: clip(
+        parseFloat(document.getElementById("clsSpeed").value) || 12,
+        1,
+        60,
+      ),
     };
     iniciarEvolucao(cfg);
   });
