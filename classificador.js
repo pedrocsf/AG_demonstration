@@ -599,14 +599,26 @@ function desenharHistograma(teste) {
   const kLabelX = kx + 5 + 36 > w - padR ? kx - 40 : kx + 5;
   ctx.fillText(kLabel, kLabelX, padT + 10);
 
-  // Eixo X
+  // Eixo X: linha base + ticks em 0, 0.25, 0.5, 0.75, 1
+  ctx.strokeStyle = "rgba(120,150,180,0.3)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT + plotH);
+  ctx.lineTo(padL + plotW, padT + plotH);
+  ctx.stroke();
+
+  ctx.font = "10px Segoe UI";
   ctx.fillStyle = "#7790a5";
-  ctx.textAlign = "left";
-  ctx.fillText("0", padL, h - 6);
   ctx.textAlign = "center";
-  ctx.fillText("score de inferência", padL + plotW / 2, h - 6);
-  ctx.textAlign = "right";
-  ctx.fillText("1", padL + plotW, h - 6);
+  for (const v of [0, 0.25, 0.5, 0.75, 1]) {
+    const tx = padL + v * plotW;
+    ctx.beginPath();
+    ctx.moveTo(tx, padT + plotH);
+    ctx.lineTo(tx, padT + plotH + 4);
+    ctx.strokeStyle = "rgba(120,150,180,0.5)";
+    ctx.stroke();
+    ctx.fillText(v.toFixed(2).replace("0.00", "0").replace("1.00", "1"), tx, h - 6);
+  }
   ctx.textAlign = "left";
 }
 
