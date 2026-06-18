@@ -356,7 +356,7 @@ function setStatus(msg) {
 function iniciarEvolucao(cfg) {
   if (rafId) cancelAnimationFrame(rafId);
 
-  rng = mulberry32(42); // execução reprodutível
+  rng = mulberry32(Date.now());
   PREP = prepararDados(DATA.X, DATA.y, rng);
 
   const pop = Array.from({ length: cfg.popSize }, () =>
