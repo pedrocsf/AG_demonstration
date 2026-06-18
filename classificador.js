@@ -595,10 +595,10 @@ function desenharHistograma(teste) {
   const { ctx, w, h } = fitCanvas(ui.histCanvas);
   ctx.clearRect(0, 0, w, h);
 
-  const padL = 38,
-    padR = 12,
+  const padL = 8,
+    padR = 8,
     padT = 12,
-    padB = 22;
+    padB = 12;
   const plotW = w - padL - padR;
   const plotH = h - padT - padB;
 
@@ -606,14 +606,6 @@ function desenharHistograma(teste) {
   const laneH = plotH / 2;
   const lane = [padT + laneH * 0.5, padT + laneH * 1.5]; // centro de cada faixa
 
-  // Rótulos das faixas
-  ctx.font = "10px Segoe UI";
-  ctx.textAlign = "right";
-  ctx.fillStyle = "rgba(0,229,255,0.85)";
-  ctx.fillText("Saudável", padL - 5, lane[0] + 4);
-  ctx.fillStyle = "rgba(255,99,132,0.9)";
-  ctx.fillText("Diabético", padL - 5, lane[1] + 4);
-  ctx.textAlign = "left";
 
   // Divisória entre faixas
   ctx.strokeStyle = "rgba(255,255,255,0.07)";
