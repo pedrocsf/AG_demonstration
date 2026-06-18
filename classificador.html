@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classificador Genético — Diabetes (Pima)</title>
+    <title>Aplicação para inferência de diabetes</title>
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
     <link rel="stylesheet" href="style.css">
@@ -17,7 +17,7 @@
             <a href="index.html" class="cls-back" title="Voltar à demonstração visual">←</a>
             <div>
                 <h1>Classificador Genético</h1>
-                <p>Evolução de uma regra de decisão interpretável — dataset Pima Indians Diabetes</p>
+                <p>Evolução de uma regra de decisão interpretável com base no dataset Pima Indians Diabetes</p>
             </div>
         </div>
         <div id="cls-status">Configure os parâmetros e clique em "Iniciar evolução".</div>
@@ -26,15 +26,15 @@
     <div id="cls-controls">
         <div class="control-group">
             <label for="clsPop">População:</label>
-            <input type="number" id="clsPop" value="80" min="10" max="500">
+            <input type="number" id="clsPop" value="200" min="10" max="500">
         </div>
         <div class="control-group">
             <label for="clsGen">Máx. gerações:</label>
-            <input type="number" id="clsGen" value="150" min="1" max="1000">
+            <input type="number" id="clsGen" value="150" min="1" max="500">
         </div>
         <div class="control-group">
             <label for="clsPatience">Convergência:</label>
-            <input type="number" id="clsPatience" value="25" min="1" max="200">
+            <input type="number" id="clsPatience" value="50" min="10" max="200">
         </div>
         <div class="control-group">
             <label for="clsCrossover">Crossover: <span id="clsCrossoverVal">80%</span></label>
@@ -54,7 +54,7 @@
     <main id="cls-dashboard">
         <!-- Curva de fitness -->
         <section class="cls-card">
-            <h2>Evolução do Fitness (F1-macro via validação cruzada)</h2>
+            <h2>Evolução do Fitness</h2>
             <canvas id="fitnessCanvas"></canvas>
             <div class="cls-legend-inline">
                 <span><i class="dot dot-best"></i> Melhor global</span>
@@ -64,12 +64,12 @@
 
         <!-- Histograma de scores -->
         <section class="cls-card">
-            <h2>Separação dos scores no teste &amp; limiar de inferência <em>k</em></h2>
+            <h2>Separação dos scores no teste e limiar de inferência <em>k</em></h2>
             <canvas id="histCanvas"></canvas>
             <div class="cls-legend-inline">
                 <span><i class="dot dot-healthy"></i> Saudável (0)</span>
                 <span><i class="dot dot-diab"></i> Diabético (1)</span>
-                <span><i class="dot dot-k"></i> limiar k</span>
+                <span><i class="dot dot-k"></i> Limiar k</span>
             </div>
         </section>
 
