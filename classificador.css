@@ -149,6 +149,7 @@
 .dot-avg { background: #8a6dff; }
 .dot-healthy { background: rgba(0, 229, 255, 0.7); }
 .dot-diab { background: rgba(255, 99, 132, 0.8); }
+.dot-err { background: transparent; border: 2px solid #ffb300; }
 .dot-k { background: #ffd166; }
 
 /* Regra de decisão */

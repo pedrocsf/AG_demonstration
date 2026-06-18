@@ -513,34 +513,76 @@ function atualizarRegra(best) {
   ui.kFill.style.width = (best.k * 100).toFixed(0) + "%";
 }
 
+// Strip plot: cada paciente é um ponto, duas faixas (real 0 / real 1).
+// Corretos = preenchidos, errados (FP/FN) = contorno vermelho/laranja.
 function desenharHistograma(teste) {
   const { ctx, w, h } = fitCanvas(ui.histCanvas);
   ctx.clearRect(0, 0, w, h);
-  const padL = 8, padR = 8, padT = 10, padB = 20;
-  const plotW = w - padL - padR, plotH = h - padT - padB;
-  const nBins = 24;
-  const bins0 = new Array(nBins).fill(0);
-  const bins1 = new Array(nBins).fill(0);
-  teste.scores.forEach((sc, i) => {
-    const b = Math.min(nBins - 1, Math.floor(sc * nBins));
-    if (PREP.yTest[i] === 1) bins1[b]++;
-    else bins0[b]++;
-  });
-  const maxCount = Math.max(1, ...bins0, ...bins1);
-  const bw = plotW / nBins;
 
-  const drawBins = (bins, color) => {
-    ctx.fillStyle = color;
-    bins.forEach((c, i) => {
-      const bh = (c / maxCount) * plotH;
-      ctx.fillRect(padL + i * bw, padT + plotH - bh, bw - 1, bh);
-    });
+  const padL = 38, padR = 12, padT = 12, padB = 22;
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+
+  // Duas faixas horizontais: topo = saudável (0), baixo = diabético (1)
+  const laneH = plotH / 2;
+  const lane = [padT + laneH * 0.5, padT + laneH * 1.5]; // centro de cada faixa
+
+  // Rótulos das faixas
+  ctx.font = "10px Segoe UI";
+  ctx.textAlign = "right";
+  ctx.fillStyle = "rgba(0,229,255,0.85)";
+  ctx.fillText("Saudável", padL - 5, lane[0] + 4);
+  ctx.fillStyle = "rgba(255,99,132,0.9)";
+  ctx.fillText("Diabético", padL - 5, lane[1] + 4);
+  ctx.textAlign = "left";
+
+  // Divisória entre faixas
+  ctx.strokeStyle = "rgba(255,255,255,0.07)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT + laneH);
+  ctx.lineTo(w - padR, padT + laneH);
+  ctx.stroke();
+
+  // Jitter vertical determinístico por paciente (sem aleatoriedade a cada frame)
+  const jitterAmp = laneH * 0.36;
+  const jitter = (i) => {
+    // hash simples: distribui uniformemente dentro da faixa
+    const h = Math.sin(i * 127.1 + 311.7) * 43758.5453;
+    return (h - Math.floor(h) - 0.5) * 2 * jitterAmp;
   };
-  drawBins(bins0, "rgba(0,229,255,0.55)");   // saudável
-  drawBins(bins1, "rgba(255,99,132,0.6)");   // diabético
 
-  // linha do limiar k
-  const kx = padL + teste.k * plotW;
+  const px = (sc) => padL + sc * plotW;
+  const R = 3.5;
+
+  teste.scores.forEach((sc, i) => {
+    const realClass = PREP.yTest[i];
+    const pred = teste.preds[i];
+    const correto = pred === realClass;
+    const cx = px(sc);
+    const cy = lane[realClass] + jitter(i);
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+
+    if (correto) {
+      // TN (azul) ou TP (rosa)
+      ctx.fillStyle = realClass === 0
+        ? "rgba(0,229,255,0.65)"
+        : "rgba(255,99,132,0.75)";
+      ctx.fill();
+    } else {
+      // FP ou FN: contorno laranja destacado, interior semitransparente
+      ctx.fillStyle = "rgba(255,180,0,0.18)";
+      ctx.fill();
+      ctx.strokeStyle = "#ffb300";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  });
+
+  // Linha vertical do limiar k
+  const kx = px(teste.k);
   ctx.strokeStyle = "#ffd166";
   ctx.lineWidth = 2;
   ctx.setLineDash([4, 3]);
@@ -549,15 +591,23 @@ function desenharHistograma(teste) {
   ctx.lineTo(kx, padT + plotH);
   ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = "#ffd166";
-  ctx.font = "10px Segoe UI";
-  ctx.fillText("k=" + teste.k.toFixed(2), Math.min(kx + 4, w - 40), padT + 10);
 
-  // eixo
+  // Rótulo do k
+  const kLabel = "k=" + teste.k.toFixed(2);
+  ctx.font = "10px Segoe UI";
+  ctx.fillStyle = "#ffd166";
+  const kLabelX = kx + 5 + 36 > w - padR ? kx - 40 : kx + 5;
+  ctx.fillText(kLabel, kLabelX, padT + 10);
+
+  // Eixo X
   ctx.fillStyle = "#7790a5";
+  ctx.textAlign = "left";
   ctx.fillText("0", padL, h - 6);
-  ctx.fillText("score", padL + plotW / 2 - 14, h - 6);
-  ctx.fillText("1", padL + plotW - 6, h - 6);
+  ctx.textAlign = "center";
+  ctx.fillText("score de inferência", padL + plotW / 2, h - 6);
+  ctx.textAlign = "right";
+  ctx.fillText("1", padL + plotW, h - 6);
+  ctx.textAlign = "left";
 }
 
 function atualizarMetricas(teste) {
